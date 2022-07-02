@@ -1,6 +1,6 @@
 import Badge from "./Badge";
 
-const Table = () => {
+const Table = ({ currentPost }: any) => {
   return (
     <div className="flex flex-col">
       <div className="overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -42,7 +42,30 @@ const Table = () => {
                 </tr>
               </thead>
               <tbody>
-                <tr className="border-b">
+                {currentPost.map((post: any, index: number) => {
+                  const { customer, provider, insuranceType }: any = post;
+                  const { firstName, lastName } = customer;
+                  return (
+                    <tr key={index} className="border-b">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                        1
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {`${firstName} ${lastName}`}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {provider}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        {insuranceType}
+                      </td>
+                      <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
+                        <Badge status="ACTIVE" />
+                      </td>
+                    </tr>
+                  );
+                })}
+                {/* <tr className="border-b">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     1
                   </td>
@@ -94,7 +117,7 @@ const Table = () => {
                   <td className="text-sm text-gray-900 font-light px-6 py-4 whitespace-nowrap">
                     <Badge status="CANCELLED" />
                   </td>
-                </tr>
+                </tr> */}
               </tbody>
             </table>
           </div>
