@@ -2,18 +2,18 @@ import { useState, useMemo, useEffect } from "react";
 import Table from "./Table";
 import { range } from "lodash";
 
-// const refPageLimit = 5;
-// const pageLimit = 5;
 const paginationDataLimit = 5;
 
-const Pagination = ({ data }: any) => {
-  console.log("all data is:", data);
+const Pagination = ({ data, type }: any) => {
   const [totalPages, setTotalPages] = useState(0);
   const [currentPage, setCurrentPage] = useState(-1);
   const [startingPage, setStartingPage] = useState(0);
   const [currentPost, setCurrentPosts] = useState(data);
   const [refPageLimit, setRefPageLimit] = useState(5);
-  const [pageLimit, setPageLimit] = useState(5);
+  const [pageLimit, setPageLimit] = useState(
+    5
+    // Math.ceil(data.length / paginationDataLimit)
+  );
 
   const changePage = (changedVal: any) => {
     const currentVal = currentPage + changedVal;
@@ -27,19 +27,19 @@ const Pagination = ({ data }: any) => {
   };
 
   useEffect(() => {
-    console.log("data111:", data);
+    // console.log("data111:", data);
     if (data.length > 0 && data.length <= 5) {
       setStartingPage(0);
       setPageLimit(1);
-    } else if (data.length > 6) {
+    } else if (data.length >= 6) {
       setStartingPage(0);
-      setPageLimit(5);
+      if (data.length % paginationDataLimit > 0) {
+        setPageLimit(Math.floor(data.length / paginationDataLimit));
+      }
     }
   }, [data]);
 
   const pages = useMemo(() => {
-    console.log("startingPage22:", startingPage);
-    console.log("pageLimit22:", pageLimit);
     const pageArray = [] as any;
     range(startingPage, startingPage + pageLimit).forEach((num) => {
       pageArray.push(
@@ -55,18 +55,10 @@ const Pagination = ({ data }: any) => {
             {num + 1}
           </a>
         </li>
-        // <Pagination.Item
-        //   className="paginationNos"
-        //   active={num === currentPage}
-        //   key={num}
-        //   onClick={() => jumpToPage(num)}
-        // >
-        //   {num + 1}
-        // </Pagination.Item>
       );
     });
     return pageArray;
-  }, [currentPage, startingPage, data, pageLimit]);
+  }, [currentPage, startingPage, pageLimit]);
 
   const nextPage = () => changePage(1);
   const prevPage = () => changePage(-1);
@@ -85,8 +77,6 @@ const Pagination = ({ data }: any) => {
       setCurrentPosts(data.slice(offset, offset + paginationDataLimit));
     }
   }, [currentPage, data]);
-
-  console.log("post data:", currentPost);
 
   return (
     <>
@@ -108,47 +98,6 @@ const Pagination = ({ data }: any) => {
               </a>
             </li>
             {pages}
-            {/* <li>
-          <a
-            href="#"
-            className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            1
-          </a>
-        </li> */}
-            {/* <li>
-          <a
-            href="#"
-            className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            2
-          </a>
-        </li> */}
-            {/* <li>
-          <a
-            href="#"
-            aria-current="page"
-            className="py-2 px-3 text-blue-600 bg-blue-50 border border-gray-300 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-          >
-            3
-          </a>
-        </li> */}
-            {/* <li>
-          <a
-            href="#"
-            className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            4
-          </a>
-        </li> */}
-            {/* <li>
-          <a
-            href="#"
-            className="py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            5
-          </a>
-        </li> */}
             <li>
               <a
                 className={`py-2 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:border-gray-700 dark:text-gray-400 ${

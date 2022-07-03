@@ -1,8 +1,7 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { debounce } from "lodash";
-import Header from "./components/Header";
+// import Header from "./components/Header";
 import Navbar from "./components/Navbar";
-// import Table from "./components/Table";
 import Filters from "./components/Filters";
 import Pagination from "./components/Pagination";
 import "./App.css";
@@ -11,6 +10,8 @@ function App() {
   const [policies, setPolicies] = useState([]);
   const [customerName, setCustomerName] = useState<string>("");
   const [filteredPolicies, setFilteredPolicies] = useState([]);
+  const [prevFilters, setPrevFilters] = useState([]);
+  const [type, setType] = useState<string>("");
 
   useEffect(() => {
     fetch("https://feather-backend.herokuapp.com/policies")
@@ -22,43 +23,59 @@ function App() {
   }, []);
 
   const handleDebounceFn = (inputValue: any) => {
-    if (!inputValue) return setFilteredPolicies(policies);
-    else if (inputValue) {
-      const newFilteredPolicies = policies.filter((policy) => {
+    if (inputValue) {
+      const newFilteredPolicies = filteredPolicies.filter((policy) => {
         const { customer } = policy;
         const { firstName, lastName } = customer;
         const fullName = `${firstName} ${lastName}`;
-        return fullName.toLowerCase().includes(inputValue.toLowerCase());
+        return fullName.toLowerCase().indexOf(inputValue.toLowerCase()) !== -1;
       });
-      console.log("new Value:", newFilteredPolicies);
-      // setFilteredPolicies(
-      //   newFilteredPolicies.length === 0 ? policies : newFilteredPolicies
-      // );
       setFilteredPolicies(newFilteredPolicies);
     }
   };
 
-  const debounceFn = debounce(handleDebounceFn, 500);
+  const debounceFn = debounce(handleDebounceFn, 300);
 
   useEffect(() => {
-    debounceFn(customerName);
+    if (customerName) {
+      debounceFn(customerName);
+    } else if (!type && !customerName) {
+      setFilteredPolicies(policies);
+    } else {
+      setFilteredPolicies(prevFilters);
+    }
   }, [customerName]);
 
   function handleChange(val: any) {
     setCustomerName(val);
   }
 
-  console.log("filtered policies:", filteredPolicies);
-  console.log("policies policies:", policies);
+  const handleTypeChange = (val: any) => {
+    if (val === "type") {
+      setFilteredPolicies(policies);
+    } else {
+      const filteredPoliciesByTypes = policies.filter(
+        ({ insuranceType }, key) => {
+          return insuranceType === val;
+        }
+      );
+      setType(val);
+      setFilteredPolicies(filteredPoliciesByTypes);
+      setPrevFilters(filteredPoliciesByTypes);
+    }
+  };
 
   return (
     <>
       <Navbar />
       <div className="w-full p-8">
         {/* <Header /> */}
-        <Filters customerName={customerName} setCustomerName={handleChange} />
-        {/* <Table /> */}
-        <Pagination data={filteredPolicies} />
+        <Filters
+          customerName={customerName}
+          setCustomerName={handleChange}
+          handleTypeChange={handleTypeChange}
+        />
+        <Pagination data={filteredPolicies} type={type} />
       </div>
     </>
   );
